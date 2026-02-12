@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="IREXA is under development. We’re building something powerful." />
+  <title>IREXA — Under Development</title>
+
+  <style>
+    :root{
+      --bg0:#06070a;
+      --bg1:#0b1020;
+      --card:#0e1630cc;
+      --text:#e9edf7;
+      --muted:#a8b2d1;
+      --line:#23315f;
+      --accent:#7c5cff;
+      --accent2:#22d3ee;
+      --shadow: 0 20px 80px rgba(0,0,0,.55);
+      --radius: 18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 15% 15%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(1000px 700px at 85% 25%, rgba(34,211,238,.18), transparent 55%),
+        radial-gradient(900px 900px at 50% 110%, rgba(124,92,255,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    .grid{
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(closest-side at 50% 40%, rgba(0,0,0,1), rgba(0,0,0,.0));
+      opacity:.25;
+      pointer-events:none;
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px 18px;
+    }
+
+    .card{
+      width:min(980px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(600px 300px at 20% 20%, rgba(124,92,255,.25), transparent 60%),
+                  radial-gradient(500px 260px at 80% 30%, rgba(34,211,238,.18), transparent 60%);
+      filter: blur(18px);
+      opacity:.85;
+      pointer-events:none;
+    }
+
+    .inner{
+      position:relative;
+      padding:42px 38px 34px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:28px;
+    }
+
+    @media (max-width: 840px){
+      .inner{grid-template-columns:1fr; padding:34px 22px}
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .logo{
+      width:46px;height:46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(34,211,238,1));
+      display:grid;
+      place-items:center;
+      box-shadow: 0 14px 40px rgba(124,92,255,.20);
+      border:1px solid rgba(255,255,255,.20);
+    }
+    .logo svg{filter: drop-shadow(0 8px 18px rgba(0,0,0,.30));}
+
+    .name{
+      display:flex;
+      flex-direction:column;
+      line-height:1.05;
+    }
+    .name strong{font-size:18px; letter-spacing:.6px}
+    .name span{color:var(--muted); font-size:13px}
+
+    h1{
+      margin:0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing:-.6px;
+    }
+
+    p{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size: 15.5px;
+      line-height:1.65;
+      max-width: 62ch;
+    }
+
+    .pillrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+    .pill{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,16,35,.55);
+      color: rgba(233,237,247,.92);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 0 4px rgba(124,92,255,.10);
+    }
+
+    .side{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(10,16,35,.38);
+      border-radius: 16px;
+      padding: 18px 18px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .status{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(6,10,22,.55);
+    }
+
+    .status .left{
+      display:flex; align-items:center; gap:10px;
+    }
+
+    .pulse{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(34,211,238,1);
+      box-shadow: 0 0 0 0 rgba(34,211,238,.45);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse{
+      0%{box-shadow: 0 0 0 0 rgba(34,211,238,.40);}
+      70%{box-shadow: 0 0 0 12px rgba(34,211,238,0);}
+      100%{box-shadow: 0 0 0 0 rgba(34,211,238,0);}
+    }
+
+    .status b{font-size: 13.5px}
+    .status small{color:var(--muted); display:block; margin-top:2px}
+
+    .contact{
+      margin-top:auto;
+      padding-top:10px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height:1.5;
+    }
+    .contact a{
+      color: var(--text);
+      text-decoration:none;
+      border-bottom: 1px dashed rgba(233,237,247,.35);
+    }
+    .contact a:hover{border-bottom-color: rgba(233,237,247,.75);}
+
+    footer{
+      position:relative;
+      padding: 14px 18px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(168,178,209,.85);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      font-size: 12.5px;
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(233,237,247,.9);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grid" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <section class="card" role="region" aria-label="IREXA Under Development">
+      <div class="inner">
+        <div>
+          <div class="brand">
+            <div class="logo" aria-hidden="true">
+              <!-- Simple mark -->
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2l7.5 4.4v11.2L12 22l-7.5-4.4V6.4L12 2z" stroke="white" stroke-width="1.6" opacity=".95"/>
+                <path d="M7.3 9.8L12 7l4.7 2.8V14L12 16.8 7.3 14V9.8z" fill="white" opacity=".92"/>
+              </svg>
+            </div>
+            <div class="name">
+              <strong>IREXA</strong>
+              <span>Intelligence • Automation • Security</span>
+            </div>
+          </div>
+
+          <h1>We’re building IREXA.</h1>
+          <p>
+            This site is under development. We’re working on a security-focused intelligence and automation platform.
+            If you’re trying to reach us, use the contact details on the right.
+          </p>
+
+          <div class="pillrow" aria-label="Highlights">
+            <div class="pill"><span class="dot"></span>Under Development</div>
+            <div class="pill"><span class="dot"></span>Defence-ready workflows</div>
+            <div class="pill"><span class="dot"></span>Offline / On-prem options</div>
+          </div>
+        </div>
+
+        <aside class="side" aria-label="Status and contact">
+          <div class="status">
+            <div class="left">
+              <span class="pulse" aria-hidden="true"></span>
+              <div>
+                <b>Status: Building in progress</b>
+                <small>We’ll publish updates soon.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="status">
+            <div class="left">
+              <span class="dot" aria-hidden="true"></span>
+              <div>
+                <b>Domain</b>
+                <small>irexa.in</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact">
+            <div><b>Contact</b></div>
+            <div style="margin-top:6px;">
+              Email: <a href="mailto:contact@irexa.in">contact@irexa.in</a><br/>
+              <span style="color:rgba(168,178,209,.85)">Replace with your real email if needed.</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer>
+        <div>© <span id="y"></span> IREXA. All rights reserved.</div>
+        <div><span class="kbd">Under Development</span></div>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
