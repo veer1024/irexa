@@ -5,7 +5,7 @@ import { CoordinateIndicator } from '../ui/CoordinateIndicator';
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 pointer-events-none">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 pointer-events-none mb-20">
       {/* Subtle grid overlay */}
       {/* <div className="absolute inset-0 opacity-10">
         <div
@@ -44,7 +44,7 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          from raw elevation data to full 3D urban intelligence — in real time.
+          from raw elevation data to full 3D intelligence — in real time.
         </motion.p>
 
         {/* Scroll cue */}

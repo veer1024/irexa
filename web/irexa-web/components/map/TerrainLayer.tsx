@@ -56,17 +56,16 @@ function makeToonGradient(): THREE.DataTexture {
 
 export function TerrainLayer({ data: _data, stage, scrollProgress }: TerrainLayerProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const outlineRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.MeshToonMaterial>(null);
-  const outlineMatRef = useRef<THREE.MeshBasicMaterial>(null);
+  const materialRef = useRef<THREE.MeshLambertMaterial>(null);
 
-  const { geometry, outlineGeo } = useMemo(() => {
+  const geometry = useMemo(() => {
     const segments = 256;
     const size = 220;
     const geo = new THREE.PlaneGeometry(size, size, segments, segments);
     geo.rotateX(-Math.PI / 2);
 
     const positions = geo.attributes.position;
+    const colors = [];
 
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i) / 60;
@@ -75,13 +74,17 @@ export function TerrainLayer({ data: _data, stage, scrollProgress }: TerrainLaye
       // Multi-layer: large ridges + fine detail
       const height = elevation * 40 + valueNoise(x * 3, z * 3) * 8;
       positions.setY(i, height);
+
+      // Height-based coloring: low = dark gray, high = light gray
+      const shade = THREE.MathUtils.clamp((height + 20) / 40, 0, 1); // normalize height
+      const gray = 0.3 + shade * 0.7; // from 0.3 to 1.0
+      colors.push(gray, gray, gray);
     }
 
-    geo.computeVertexNormals();
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-    // Outline geo = same geometry, slightly scaled up for toon outline
-    const outGeo = geo.clone();
-    return { geometry: geo, outlineGeo: outGeo };
+    geo.computeVertexNormals();
+    return geo;
   }, []);
 
   const gradientMap = useMemo(() => makeToonGradient(), []);
@@ -99,16 +102,9 @@ export function TerrainLayer({ data: _data, stage, scrollProgress }: TerrainLaye
     }
 
     meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, targetScaleY, 0.07);
-    if (outlineRef.current) {
-      outlineRef.current.scale.y = meshRef.current.scale.y;
-      outlineRef.current.visible = meshRef.current.scale.y > 0.05;
-    }
 
     const vis = meshRef.current.scale.y;
     materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity, vis > 0.02 ? 1 : 0, 0.06);
-    if (outlineMatRef.current) {
-      outlineMatRef.current.opacity = materialRef.current.opacity;
-    }
   });
 
   return (
@@ -116,24 +112,11 @@ export function TerrainLayer({ data: _data, stage, scrollProgress }: TerrainLaye
       {/* Always-visible base grid — subtle */}
       <gridHelper args={[400, 100, '#d0d0d0', '#e8e8e8']} position={[0, 0.1, 0]} />
 
-      {/* Toon-shaded terrain */}
-      <mesh ref={meshRef} geometry={geometry} scale={[1, 0, 1]} receiveShadow castShadow>
-        <meshToonMaterial
+      {/* Terrain mesh */}
+      <mesh geometry={geometry} scale={[1, 0, 1]} receiveShadow castShadow>
+        <meshLambertMaterial
           ref={materialRef}
-          color="#ffffff"
-          gradientMap={gradientMap}
-          transparent
-          opacity={0}
-          side={THREE.FrontSide}
-        />
-      </mesh>
-
-      {/* Toon outline — back-face scaled trick */}
-      <mesh ref={outlineRef} geometry={outlineGeo} scale={[1.012, 0, 1.012]}>
-        <meshBasicMaterial
-          ref={outlineMatRef}
-          color="#111111"
-          side={THREE.BackSide}
+          vertexColors
           transparent
           opacity={0}
         />

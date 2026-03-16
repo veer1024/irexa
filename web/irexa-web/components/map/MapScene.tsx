@@ -42,9 +42,9 @@ function SceneInternal({ data, stage, scrollProgress }: SceneInternalProps) {
 
   useFrame(() => {
     const kf = CAMERA_KEYFRAMES[Math.min(stage, CAMERA_KEYFRAMES.length - 1)];
-    camera.position.lerp(kf.pos, 0.035);
+    camera.position.lerp(kf.pos, 0.08);
     targetLookAt.current.copy(kf.lookAt);
-    currentLookAt.current.lerp(targetLookAt.current, 0.035);
+    currentLookAt.current.lerp(targetLookAt.current, 0.08);
     camera.lookAt(currentLookAt.current);
   });
 
@@ -52,17 +52,17 @@ function SceneInternal({ data, stage, scrollProgress }: SceneInternalProps) {
     <>
       <ambientLight intensity={0.6} color="#ffffff" />
       <directionalLight
-        position={[50, 100, 40]}
+        position={[100, 50, 0]}
         intensity={2.0}
         color="#ffffff"
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-far={700}
-        shadow-camera-left={-200}
-        shadow-camera-right={200}
-        shadow-camera-top={200}
-        shadow-camera-bottom={-200}
+        shadow-camera-left={-250}
+        shadow-camera-right={250}
+        shadow-camera-top={250}
+        shadow-camera-bottom={-250}
       />
       <hemisphereLight args={['#e8eaff', '#d8d8d8', 0.4]} />
 

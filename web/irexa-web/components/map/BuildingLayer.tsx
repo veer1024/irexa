@@ -42,6 +42,7 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
   const { size } = useThree();
   const instancedRef = useRef<THREE.InstancedMesh>(null);
   const footprintGroupRef = useRef<THREE.Group>(null);
+  const edgeGroupRef = useRef<THREE.Group>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const gradientMap = useMemo(() => makeBuildingToonGradient(), []);
 
@@ -82,6 +83,33 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
     });
   }, [features, size.width, size.height]);
 
+  // Edge lines for building tops (stage 3)
+  const edgeLines = useMemo(() => {
+    if (!size.width) return [];
+    return features.map((f) => {
+      const coords = f.geometry.coordinates[0];
+      const positions: number[] = [];
+      // close the ring at top height
+      const ring = [...coords, coords[0]];
+      ring.forEach((c) => positions.push(c[0], 0, c[1])); // height will be set in useFrame
+
+      const geo = new LineGeometry();
+      geo.setPositions(positions);
+
+      const mat = new LineMaterial({
+        color: 0xffffff,
+        linewidth: 2.0,
+        resolution: new THREE.Vector2(size.width, size.height),
+        transparent: true,
+        opacity: 0,
+      });
+
+      const line = new Line2(geo, mat);
+      line.computeLineDistances();
+      return line;
+    });
+  }, [features, size.width, size.height]);
+
   // Solid building material (toon)
   const solidMaterial = useMemo(() => new THREE.MeshToonMaterial({
     color: '#f8f8f8',
@@ -95,6 +123,12 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
     footprintLines.forEach((l) => footprintGroupRef.current!.add(l));
     return () => footprintLines.forEach((l) => footprintGroupRef.current?.remove(l));
   }, [footprintLines]);
+
+  useEffect(() => {
+    if (!edgeGroupRef.current) return;
+    edgeLines.forEach((l) => edgeGroupRef.current!.add(l));
+    return () => edgeLines.forEach((l) => edgeGroupRef.current?.remove(l));
+  }, [edgeLines]);
 
   useFrame(({ clock }) => {
     const pulse = 0.7 + Math.sin(clock.elapsedTime * 3.5) * 0.3;
@@ -128,6 +162,18 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
         dummy.scale.set(b.width, b.currentHeight, b.depth);
         dummy.updateMatrix();
         instancedRef.current!.setMatrixAt(i, dummy.matrix);
+
+        // Update edge line position
+        const line = edgeLines[i];
+        if (line) {
+          const positions = line.geometry.attributes.position.array as Float32Array;
+          for (let j = 1; j < positions.length; j += 3) {
+            positions[j] = b.currentHeight;
+          }
+          line.geometry.attributes.position.needsUpdate = true;
+          const mat = line.material as LineMaterial;
+          mat.opacity = Math.min(1, b.currentHeight / 10);
+        }
       });
       instancedRef.current.instanceMatrix.needsUpdate = true;
     } else {
@@ -138,6 +184,18 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
         dummy.scale.set(b.width, b.currentHeight, b.depth);
         dummy.updateMatrix();
         if (instancedRef.current) instancedRef.current.setMatrixAt(i, dummy.matrix);
+
+        // Update edge line position
+        const line = edgeLines[i];
+        if (line) {
+          const positions = line.geometry.attributes.position.array as Float32Array;
+          for (let j = 1; j < positions.length; j += 3) {
+            positions[j] = b.currentHeight;
+          }
+          line.geometry.attributes.position.needsUpdate = true;
+          const mat = line.material as LineMaterial;
+          mat.opacity = 0;
+        }
       });
       if (instancedRef.current) instancedRef.current.instanceMatrix.needsUpdate = true;
     }
@@ -148,6 +206,7 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
   return (
     <>
       <group ref={footprintGroupRef} />
+      <group ref={edgeGroupRef} />
       <instancedMesh
         ref={instancedRef}
         args={[new THREE.BoxGeometry(1, 1, 1), solidMaterial, count]}

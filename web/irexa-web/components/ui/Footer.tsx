@@ -2,10 +2,10 @@
 
 export function Footer() {
   return (
-    <footer id="contact" className="relative w-full flex flex-col justify-between text-black pointer-events-auto mt-[-1px]">
+    <footer id="contact" className="relative w-full flex flex-col justify-between text-black pointer-events-auto -mt-32px">
       {/* Backdrop blur gradient container */}
       <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-white backdrop-blur-[20px] mask-[linear-gradient(to_top,black_70%,transparent)]" />
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-[20px] mask-[linear-gradient(to_top,black_70%,transparent)]" />
       </div>
 
       <div className="absolute -top-64 left-0 w-full h-64 pointer-events-none z-0" />

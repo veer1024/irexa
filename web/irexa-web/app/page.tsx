@@ -8,9 +8,11 @@ import dynamic from 'next/dynamic';
 
 const MapScene = dynamic(() => import('../components/map/MapScene').then(mod => mod.MapScene), {
   ssr: false,
+  loading: () => <div className="fixed inset-0 flex items-center justify-center bg-white z-0"><div className="text-black">Loading 3D Intelligence...</div></div>
 });
 
 import { useState } from 'react';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export default function Home() {
   const [activeStage, setActiveStage] = useState(0);
@@ -21,7 +23,9 @@ export default function Home() {
 
       {/* Fixed Map Background */}
       <div className="fixed inset-0 z-0 bg-white">
-        <MapScene onStageChange={setActiveStage} />
+        <ErrorBoundary>
+          <MapScene onStageChange={setActiveStage} />
+        </ErrorBoundary>
       </div>
 
       {/* Scrollable Overlay Components */}
