@@ -41,6 +41,7 @@ function getBounds(coords: number[][]): { cx: number; cz: number; width: number;
 export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProps) {
   const { size } = useThree();
   const instancedRef = useRef<THREE.InstancedMesh>(null);
+  const wireframeRef = useRef<THREE.InstancedMesh>(null);
   const footprintGroupRef = useRef<THREE.Group>(null);
   const edgeGroupRef = useRef<THREE.Group>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -118,6 +119,14 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
     opacity: 0,
   }), [gradientMap]);
 
+  // Wireframe material for black edges
+  const wireframeMaterial = useMemo(() => new THREE.MeshBasicMaterial({
+    color: '#000000',
+    wireframe: true,
+    transparent: true,
+    opacity: 0,
+  }), []);
+
   useEffect(() => {
     if (!footprintGroupRef.current) return;
     footprintLines.forEach((l) => footprintGroupRef.current!.add(l));
@@ -152,6 +161,7 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
     if (stage >= 3) {
       const stageP = Math.max(0, Math.min(1, (scrollProgress - 0.75) / 0.25));
       solidMaterial.opacity = THREE.MathUtils.lerp(solidMaterial.opacity, stageP > 0.05 ? 1 : 0, 0.06);
+      wireframeMaterial.opacity = THREE.MathUtils.lerp(wireframeMaterial.opacity, stageP > 0.05 ? 0.8 : 0, 0.06);
 
       buildingData.forEach((b, i) => {
         const delayed = Math.max(0, Math.min(1, (stageP - b.delay * 0.5) / 0.5));
@@ -162,6 +172,7 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
         dummy.scale.set(b.width, b.currentHeight, b.depth);
         dummy.updateMatrix();
         instancedRef.current!.setMatrixAt(i, dummy.matrix);
+        if (wireframeRef.current) wireframeRef.current.setMatrixAt(i, dummy.matrix);
 
         // Update edge line position
         const line = edgeLines[i];
@@ -176,14 +187,17 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
         }
       });
       instancedRef.current.instanceMatrix.needsUpdate = true;
+      if (wireframeRef.current) wireframeRef.current.instanceMatrix.needsUpdate = true;
     } else {
       solidMaterial.opacity = THREE.MathUtils.lerp(solidMaterial.opacity, 0, 0.07);
+      wireframeMaterial.opacity = THREE.MathUtils.lerp(wireframeMaterial.opacity, 0, 0.07);
       buildingData.forEach((b, i) => {
         b.currentHeight = THREE.MathUtils.lerp(b.currentHeight, 0.05, 0.07);
         dummy.position.set(b.cx, b.currentHeight / 2, b.cz);
         dummy.scale.set(b.width, b.currentHeight, b.depth);
         dummy.updateMatrix();
         if (instancedRef.current) instancedRef.current.setMatrixAt(i, dummy.matrix);
+        if (wireframeRef.current) wireframeRef.current.setMatrixAt(i, dummy.matrix);
 
         // Update edge line position
         const line = edgeLines[i];
@@ -198,6 +212,7 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
         }
       });
       if (instancedRef.current) instancedRef.current.instanceMatrix.needsUpdate = true;
+      if (wireframeRef.current) wireframeRef.current.instanceMatrix.needsUpdate = true;
     }
   });
 
@@ -212,6 +227,10 @@ export function BuildingLayer({ data, stage, scrollProgress }: BuildingLayerProp
         args={[new THREE.BoxGeometry(1, 1, 1), solidMaterial, count]}
         castShadow
         receiveShadow
+      />
+      <instancedMesh
+        ref={wireframeRef}
+        args={[new THREE.BoxGeometry(1, 1, 1), wireframeMaterial, count]}
       />
     </>
   );
