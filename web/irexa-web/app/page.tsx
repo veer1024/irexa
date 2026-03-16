@@ -10,20 +10,24 @@ const MapScene = dynamic(() => import('../components/map/MapScene').then(mod => 
   ssr: false,
 });
 
+import { useState } from 'react';
+
 export default function Home() {
+  const [activeStage, setActiveStage] = useState(0);
+
   return (
     <main className="bg-white text-black relative w-full h-full min-h-screen">
       <Navbar />
 
       {/* Fixed Map Background */}
       <div className="fixed inset-0 z-0 bg-white">
-        <MapScene scrollProgress={0} /> {/* Scroll progress will now be managed internally by MapScene via GSAP */}
+        <MapScene onStageChange={setActiveStage} />
       </div>
 
       {/* Scrollable Overlay Components */}
       <div className="relative z-10 w-full">
         <HeroSection />
-        <NarrativeSections />
+        <NarrativeSections activeStage={activeStage} />
       </div>
 
       <Footer />

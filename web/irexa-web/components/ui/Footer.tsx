@@ -2,12 +2,13 @@
 
 export function Footer() {
   return (
-    <footer id="contact" className="relative w-full flex flex-col justify-between bg-white text-black pointer-events-auto mt-[-1px]">
-      {/* 
-        This is the gradient that sits positioned at the top of the footer and covers the map canvas visually, 
-        giving the impression that the map fades completely out into solid white geometry.
-      */}
-      <div className="absolute -top-64 left-0 w-full h-64 bg-gradient-to-t from-white to-transparent pointer-events-none z-0" />
+    <footer id="contact" className="relative w-full flex flex-col justify-between text-black pointer-events-auto mt-[-1px]">
+      {/* Backdrop blur gradient container */}
+      <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-white backdrop-blur-[20px] mask-[linear-gradient(to_top,black_70%,transparent)]" />
+      </div>
+
+      <div className="absolute -top-64 left-0 w-full h-64 pointer-events-none z-0" />
 
       <div className="relative z-10 w-full min-h-[70vh] flex flex-col justify-between px-6 py-12">
         <div className="max-w-7xl mx-auto w-full flex justify-between items-start pt-20">

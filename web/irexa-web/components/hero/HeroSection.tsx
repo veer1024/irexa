@@ -30,12 +30,12 @@ export function HeroSection() {
         </motion.div>
 
         <motion.h1
-          className="text-7xl md:text-9xl font-headline font-bold tracking-tighter leading-none"
+          className="text-7xl md:text-9xl font-headline font-bold tracking-tighter leading-none flex items-baseline justify-center"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          IREXA
+          ir<span className="text-[#87C643]">e<sup>x</sup></span>a
         </motion.h1>
 
         <motion.p
@@ -44,7 +44,7 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          From raw elevation data to full 3D urban intelligence — in real time.
+          from raw elevation data to full 3D urban intelligence — in real time.
         </motion.p>
 
         {/* Scroll cue */}
@@ -54,20 +54,20 @@ export function HeroSection() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1 }}
         >
-          <span className="font-label text-xs tracking-widest text-black/30 uppercase">Scroll to Explore</span>
+          <span className="font-label text-xs tracking-widest text-black/30 uppercase text-lowercase">scroll to explore</span>
           <div className="w-px h-12 bg-linear-to-b from-black/20 to-transparent" />
         </motion.div>
       </div>
 
       {/* Corner labels */}
       <div className="absolute top-8 left-8 space-y-2">
-        <CoordinateIndicator coord="COORD" value="40.7128°N 74.0060°W" />
-        <CoordinateIndicator coord="STATUS" value="ACTIVE" />
+        <CoordinateIndicator coord="coord" value="40.7128°n 74.0060°w" />
+        <CoordinateIndicator coord="status" value="active" />
       </div>
 
       <div className="absolute bottom-8 right-8 space-y-2 text-right">
-        <CoordinateIndicator coord="AI MODEL" value="IREXA v2.1" />
-        <CoordinateIndicator coord="DATA STREAM" value="LIVE" />
+        <CoordinateIndicator coord="ai model" value="irexa v2.1" />
+        <CoordinateIndicator coord="data stream" value="live" />
       </div>
     </section>
   );

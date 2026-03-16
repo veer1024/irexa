@@ -38,7 +38,7 @@ function fbm(x: number, z: number): number {
   let value = 0;
   let amplitude = 0.5;
   let frequency = 1;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 8; i++) {
     value += valueNoise(x * frequency, z * frequency) * amplitude;
     amplitude *= 0.5;
     frequency *= 2.1;
@@ -61,7 +61,7 @@ export function TerrainLayer({ data: _data, stage, scrollProgress }: TerrainLaye
   const outlineMatRef = useRef<THREE.MeshBasicMaterial>(null);
 
   const { geometry, outlineGeo } = useMemo(() => {
-    const segments = 100;
+    const segments = 256;
     const size = 220;
     const geo = new THREE.PlaneGeometry(size, size, segments, segments);
     geo.rotateX(-Math.PI / 2);
@@ -73,7 +73,7 @@ export function TerrainLayer({ data: _data, stage, scrollProgress }: TerrainLaye
       const z = positions.getZ(i) / 60;
       const elevation = fbm(x, z);
       // Multi-layer: large ridges + fine detail
-      const height = elevation * 28 + valueNoise(x * 3, z * 3) * 5;
+      const height = elevation * 40 + valueNoise(x * 3, z * 3) * 8;
       positions.setY(i, height);
     }
 
@@ -114,13 +114,13 @@ export function TerrainLayer({ data: _data, stage, scrollProgress }: TerrainLaye
   return (
     <group>
       {/* Always-visible base grid — subtle */}
-      <gridHelper args={[220, 55, '#d0d0d0', '#e8e8e8']} position={[0, 0.1, 0]} />
+      <gridHelper args={[400, 100, '#d0d0d0', '#e8e8e8']} position={[0, 0.1, 0]} />
 
       {/* Toon-shaded terrain */}
       <mesh ref={meshRef} geometry={geometry} scale={[1, 0, 1]} receiveShadow castShadow>
         <meshToonMaterial
           ref={materialRef}
-          color="#e0e0e0"
+          color="#ffffff"
           gradientMap={gradientMap}
           transparent
           opacity={0}

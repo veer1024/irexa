@@ -50,21 +50,21 @@ function SceneInternal({ data, stage, scrollProgress }: SceneInternalProps) {
 
   return (
     <>
-      <ambientLight intensity={0.8} color="#ffffff" />
+      <ambientLight intensity={0.6} color="#ffffff" />
       <directionalLight
-        position={[80, 150, 60]}
-        intensity={1.8}
+        position={[50, 100, 40]}
+        intensity={2.0}
         color="#ffffff"
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-far={700}
-        shadow-camera-left={-160}
-        shadow-camera-right={160}
-        shadow-camera-top={160}
-        shadow-camera-bottom={-160}
+        shadow-camera-left={-200}
+        shadow-camera-right={200}
+        shadow-camera-top={200}
+        shadow-camera-bottom={-200}
       />
-      <hemisphereLight args={['#e8eaff', '#d8d8d8', 0.3]} />
+      <hemisphereLight args={['#e8eaff', '#d8d8d8', 0.4]} />
 
       <TerrainLayer
         data={data as Parameters<typeof TerrainLayer>[0]['data']}
@@ -93,8 +93,11 @@ export function MapScene({ scrollProgress: _ext, onStageChange }: MapSceneProps)
 
   const handleStage = useCallback((s: number) => {
     setStage(s);
-    onStageChange?.(s);
-  }, [onStageChange]);
+  }, []);
+
+  useEffect(() => {
+    onStageChange?.(stage);
+  }, [stage, onStageChange]);
 
   useEffect(() => {
     fetch('/maps/scene-data.json')

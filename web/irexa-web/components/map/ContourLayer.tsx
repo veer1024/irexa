@@ -50,7 +50,7 @@ export function ContourLayer({ data, stage, scrollProgress }: ContourLayerProps)
 
       const mat = new LineMaterial({
         color: isMajor ? 0x111111 : 0x333333,
-        linewidth: isMajor ? 3.5 : 1.8, // world-space px
+        linewidth: isMajor ? 4.0 : 2.2, // world-space px
         resolution: new THREE.Vector2(size.width, size.height),
         transparent: true,
         opacity: 0,
