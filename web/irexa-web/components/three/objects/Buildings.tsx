@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-// @ts-ignore - three.js types
 import { InstancedMesh, Object3D } from 'three';
 import { useFrame } from '@react-three/fiber';
 
@@ -21,7 +20,7 @@ export function Buildings({ scrollProgress }: BuildingsProps) {
   useFrame(() => {
     if (meshRef.current) {
       buildingData.forEach((building, i) => {
-        const extrusionProgress = Math.min(scrollProgress * 2, 1); // Extrude as scroll progresses
+        const extrusionProgress = Math.min(scrollProgress * 2, 1);
         const currentHeight = building.height * extrusionProgress;
 
         tempObject.position.set(...building.position);
@@ -34,13 +33,9 @@ export function Buildings({ scrollProgress }: BuildingsProps) {
   });
 
   return (
-    // @ts-ignore - Three.js JSX types
     <instancedMesh ref={meshRef} args={[undefined, undefined, buildingData.length]}>
-      {/* @ts-ignore */}
       <boxGeometry args={[1, 1, 1]} />
-      {/* @ts-ignore */}
       <meshBasicMaterial color="#00FF9C" transparent opacity={0.7} />
-    {/* @ts-ignore */}
     </instancedMesh>
   );
 }

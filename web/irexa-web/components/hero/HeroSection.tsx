@@ -1,65 +1,71 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import dynamic from 'next/dynamic';
-import { ScanAnimation } from '../ui/ScanAnimation';
 import { CoordinateIndicator } from '../ui/CoordinateIndicator';
-import { useScrollProgress } from '../../lib/hooks/useScrollProgress';
-
-// Dynamically import MapScene to avoid React Three Fiber module evaluation issues
-const MapScene = dynamic(() => import('../map/MapScene').then(mod => mod.MapScene), {
-  ssr: false,
-  loading: () => <div className="w-full h-full bg-black" />
-});
 
 export function HeroSection() {
-  const scrollProgress = useScrollProgress();
-
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden px-6 pointer-events-none">
-      {/* Grid Overlay */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KPGcgZmlsbD0iI2ZmZmZmZmIiIGZpbGwtb3BhY2l0eT0iMC4xIj4KPHBhdGggZD0iTTQwIDBMMCAwaDAgNDB6Ii8+CjwvZz4KPC9nPgo8L3N2Zz4K')] bg-repeat"></div>
-      </div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 pointer-events-none">
+      {/* Subtle grid overlay */}
+      {/* <div className="absolute inset-0 opacity-10">
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+      </div> */}
 
-      {/* Scanning Animation */}
-      <ScanAnimation />
-
-      {/* Content */}
-      <div className="relative z-10 text-center px-6">
-        <motion.h1
-          className="text-6xl md:text-8xl font-headline font-bold mb-6 tracking-tight"
-          initial={{ opacity: 0, y: 20 }}
+      {/* Center content */}
+      <div className="relative z-10 text-center">
+        <motion.div
+          className="font-label text-xs tracking-[0.4em] text-black/40 mb-6 uppercase"
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+        >
+          Spatial Intelligence Platform
+        </motion.div>
+
+        <motion.h1
+          className="text-7xl md:text-9xl font-headline font-bold tracking-tighter leading-none"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           IREXA
         </motion.h1>
+
         <motion.p
-          className="text-xl md:text-2xl font-label max-w-2xl mx-auto leading-relaxed"
+          className="text-lg md:text-xl font-body text-black/60 mt-6 max-w-md mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Spatial Intelligence Interface
+          From raw elevation data to full 3D urban intelligence — in real time.
         </motion.p>
+
+        {/* Scroll cue */}
         <motion.div
-          className="mt-8 text-accent font-label text-sm tracking-wider"
+          className="mt-16 flex flex-col items-center gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.4 }}
+          transition={{ duration: 1, delay: 1 }}
         >
-          INITIALIZING SYSTEM...
+          <span className="font-label text-xs tracking-widest text-black/30 uppercase">Scroll to Explore</span>
+          <div className="w-px h-12 bg-linear-to-b from-black/20 to-transparent" />
         </motion.div>
       </div>
 
-      {/* System Labels */}
+      {/* Corner labels */}
       <div className="absolute top-8 left-8 space-y-2">
         <CoordinateIndicator coord="COORD" value="40.7128°N 74.0060°W" />
         <CoordinateIndicator coord="STATUS" value="ACTIVE" />
       </div>
 
-      <div className="absolute bottom-8 right-8 space-y-2">
+      <div className="absolute bottom-8 right-8 space-y-2 text-right">
         <CoordinateIndicator coord="AI MODEL" value="IREXA v2.1" />
         <CoordinateIndicator coord="DATA STREAM" value="LIVE" />
       </div>

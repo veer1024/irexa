@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import { TerrainLayer } from './TerrainLayer';
 import { ContourLayer } from './ContourLayer';
 import { BuildingLayer } from './BuildingLayer';
-import { ScanEffect } from './ScanEffect';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
@@ -14,107 +13,139 @@ import * as THREE from 'three';
 gsap.registerPlugin(ScrollTrigger);
 
 interface MapSceneProps {
-  scrollProgress?: number; // Kept for backwards compatibility but we rely on internal GSAP state
+  scrollProgress?: number;
+  onStageChange?: (stage: number) => void;
 }
 
-function SceneOrchestrator({ data, setStage, stage, setProgress }: any) {
+// Fixed cinematic camera keyframes — NO random targets
+const CAMERA_KEYFRAMES = [
+  // Stage 0: Hero — top-down overview
+  { pos: new THREE.Vector3(0, 350, 0),    lookAt: new THREE.Vector3(0, 0, 0) },
+  // Stage 1: Terrain — slight tilt to see ridges
+  { pos: new THREE.Vector3(-15, 160, 70), lookAt: new THREE.Vector3(0, 15, 0) },
+  // Stage 2: Detection — straight top-down, closer
+  { pos: new THREE.Vector3(0, 200, 0),    lookAt: new THREE.Vector3(0, 0, 0) },
+  // Stage 3: 3D intel — centered lateral perspective
+  { pos: new THREE.Vector3(0, 90, 160),   lookAt: new THREE.Vector3(0, 20, 0) },
+];
+
+interface SceneInternalProps {
+  data: Record<string, unknown> | null;
+  stage: number;
+  scrollProgress: number;
+}
+
+function SceneInternal({ data, stage, scrollProgress }: SceneInternalProps) {
   const { camera } = useThree();
-  const [internalStage, setInternalStage] = useState(0);
-  // Generate pseudo-random coordinates to zoom into during stages
-  const target1 = useMemo(() => new THREE.Vector3(Math.random() * 200 - 100, 0, Math.random() * 200 - 100), []);
-  const target2 = useMemo(() => new THREE.Vector3(Math.random() * 200 - 100, 0, Math.random() * 200 - 100), []);
-  const target3 = useMemo(() => new THREE.Vector3(Math.random() * 200 - 100, 0, Math.random() * 200 - 100), []);
-
   const currentLookAt = useRef(new THREE.Vector3(0, 0, 0));
+  const targetLookAt = useRef(new THREE.Vector3(0, 0, 0));
 
-  useEffect(() => {
-    // Starting camera position (Top down, zoomed out)
-    camera.position.set(0, 350, 0);
-
-    // Build the master ScrollTrigger timeline linked to body scroll
-    const scrollTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: document.body,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1, // Smooth scrubbing
-        onUpdate: (self) => {
-          setProgress(self.progress);
-        }
-      }
-    });
-
-    // Stage 1 -> 2: Camera pans, tilts, and zooms into target 1
-    scrollTl.to(camera.position, {
-      x: target1.x, y: 150, z: target1.z + 50, duration: 1,
-      onStart: () => setStage(0),
-      onComplete: () => { setStage(1); setInternalStage(1); }
-    }, "0")
-    
-    // Stage 2 -> 3: Full Perspective, zoom close to target 2
-    .to(camera.position, {
-      x: target2.x, y: 70, z: target2.z + 100, duration: 2,
-      onComplete: () => { setStage(2); setInternalStage(2); },
-      onReverseComplete: () => { setStage(1); setInternalStage(1); }
-    }, ">");
-
-    return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
-    };
-  }, [camera, setStage, setProgress, target1, target2, target3]);
-
-  useFrame((state, delta) => {
-    // Dynamically update the LookAt target based on the stage
-    let target = new THREE.Vector3(0, 0, 0);
-    if (internalStage === 1) target = target1;
-    if (internalStage === 2) target = target2;
-
-    currentLookAt.current.lerp(target, 2 * delta);
+  useFrame(() => {
+    const kf = CAMERA_KEYFRAMES[Math.min(stage, CAMERA_KEYFRAMES.length - 1)];
+    camera.position.lerp(kf.pos, 0.035);
+    targetLookAt.current.copy(kf.lookAt);
+    currentLookAt.current.lerp(targetLookAt.current, 0.035);
     camera.lookAt(currentLookAt.current);
   });
 
   return (
     <>
-      {/* @ts-ignore */}
-      <ambientLight intensity={0.4} />
-      {/* @ts-ignore */}
-      <directionalLight position={[10, 50, 30]} intensity={1.5} color="#00FF9C" />
+      <ambientLight intensity={0.8} color="#ffffff" />
+      <directionalLight
+        position={[80, 150, 60]}
+        intensity={1.8}
+        color="#ffffff"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={700}
+        shadow-camera-left={-160}
+        shadow-camera-right={160}
+        shadow-camera-top={160}
+        shadow-camera-bottom={-160}
+      />
+      <hemisphereLight args={['#e8eaff', '#d8d8d8', 0.3]} />
 
-      {/* Layers */}
-      <TerrainLayer data={data} />
-      <ContourLayer data={data} />
-      <BuildingLayer data={data} stage={stage} progress={ScrollTrigger.maxScroll(window) > 0 ? window.scrollY / ScrollTrigger.maxScroll(window) : 0} />
-      <ScanEffect stage={stage} />
+      <TerrainLayer
+        data={data as Parameters<typeof TerrainLayer>[0]['data']}
+        stage={stage}
+        scrollProgress={scrollProgress}
+      />
+      <ContourLayer
+        data={data as Parameters<typeof ContourLayer>[0]['data']}
+        stage={stage}
+        scrollProgress={scrollProgress}
+      />
+      <BuildingLayer
+        data={data as Parameters<typeof BuildingLayer>[0]['data']}
+        stage={stage}
+        scrollProgress={scrollProgress}
+      />
     </>
   );
 }
 
-export function MapScene({ scrollProgress }: MapSceneProps) {
-  const [data, setData] = useState<{ buildings: any; contours: any } | null>(null);
+export function MapScene({ scrollProgress: _ext, onStageChange }: MapSceneProps) {
+  const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [stage, setStage] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
+
+  const handleStage = useCallback((s: number) => {
+    setStage(s);
+    onStageChange?.(s);
+  }, [onStageChange]);
 
   useEffect(() => {
-    // Fetch mock map data (GeoJSON interpreted as features)
-    fetch('/maps/terrain.topo.json')
-      .then(res => res.json())
-      .then(json => setData(json))
-      .catch(err => console.error("Could not load map data", err));
+    fetch('/maps/scene-data.json')
+      .then((r) => r.json())
+      .then(setData)
+      .catch((e) => console.error('Map data load failed', e));
   }, []);
 
+  useEffect(() => {
+    // Wait for full DOM paint before creating trigger
+    const init = () => {
+      // Kill any previous trigger
+      triggerRef.current?.kill();
+
+      triggerRef.current = ScrollTrigger.create({
+        trigger: document.documentElement,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1.2,
+        onUpdate: (self) => {
+          const p = self.progress;
+          setScrollProgress(p);
+          if (p < 0.25) handleStage(0);
+          else if (p < 0.5) handleStage(1);
+          else if (p < 0.75) handleStage(2);
+          else handleStage(3);
+        },
+      });
+
+      ScrollTrigger.refresh();
+    };
+
+    // Double requestAnimationFrame ensures DOM is fully painted
+    requestAnimationFrame(() => requestAnimationFrame(init));
+
+    return () => {
+      triggerRef.current?.kill();
+    };
+  }, [handleStage]);
+
   return (
-    // @ts-ignore
-    <Canvas className="w-full h-full pointer-events-none">
-      {/* @ts-ignore */}
-      <PerspectiveCamera makeDefault position={[0, 120, 0]} fov={45} />
-      
-      {/* Dynamic Orchestrator handles camera state and animation logic */}
-      <SceneOrchestrator 
-        data={data} 
-        setStage={setStage} 
-        stage={stage} 
-        setProgress={setProgress} 
-      />
+    <Canvas
+      shadows
+      className="w-full h-full pointer-events-none"
+      gl={{ antialias: true, alpha: false }}
+      onCreated={({ gl }) => {
+        gl.setClearColor('#ffffff', 1);
+      }}
+    >
+      <PerspectiveCamera makeDefault position={[0, 350, 0]} fov={42} near={1} far={2000} />
+      <SceneInternal data={data} stage={stage} scrollProgress={scrollProgress} />
     </Canvas>
   );
 }

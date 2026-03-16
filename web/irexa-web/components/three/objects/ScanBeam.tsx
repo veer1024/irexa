@@ -31,11 +31,8 @@ export function ScanBeam() {
   });
 
   return (
-    // @ts-ignore - Three.js JSX types
     <mesh ref={meshRef} position={[0, 2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      {/* @ts-ignore */}
       <planeGeometry args={[20, 20]} />
-      {/* @ts-ignore */}
       <shaderMaterial
         ref={materialRef}
         vertexShader={vertexShader}
@@ -45,7 +42,6 @@ export function ScanBeam() {
         }}
         transparent
       />
-    {/* @ts-ignore */}
     </mesh>
   );
 }
