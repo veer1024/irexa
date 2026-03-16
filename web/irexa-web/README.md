@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IREXA - Spatial Intelligence Interface
+
+A Next.js web application featuring an advanced spatial intelligence interface with 3D visualizations, scroll-driven animations, and a technical UI design.
+
+## Features
+
+- **Three.js 3D Scene**: Interactive WebGL terrain and building visualizations
+- **Scroll-Driven Animations**: Camera movement and 3D extrusion based on scroll progress
+- **Smooth Scrolling**: Lenis-powered smooth scroll experience
+- **Technical UI**: Coordinate indicators, scan animations, and system labels
+- **Responsive Design**: Optimized for desktop and mobile devices
+- **Performance Optimized**: Instanced meshes and lightweight shaders
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **3D Graphics**: Three.js with React Three Fiber
+- **Animations**: Framer Motion
+- **Styling**: Tailwind CSS
+- **Fonts**: Sora (headlines), Space Grotesk (labels)
+- **Smooth Scroll**: Lenis
+
+## Project Structure
+
+```
+app/
+├── globals.css
+├── layout.tsx
+├── page.tsx
+
+components/
+├── hero/
+│   └── HeroSection.tsx
+├── map/
+│   └── MapScene.tsx
+├── sections/
+│   └── NarrativeSections.tsx
+├── three/
+│   ├── objects/
+│   │   ├── Buildings.tsx
+│   │   ├── ScanBeam.tsx
+│   │   └── Terrain.tsx
+│   └── scenes/
+├── ui/
+│   ├── CoordinateIndicator.tsx
+│   └── ScanAnimation.tsx
+
+lib/
+├── hooks/
+│   └── useScrollProgress.ts
+├── utils/
+│   └── SmoothScroll.tsx
+```
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## Learn More
+## Build
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Color Scheme
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Background: Black (#000000)
+- Text: White (#FFFFFF)
+- Accent: Green (#00FF9C) - used for detections, AI indicators, highlights
 
-## Deploy on Vercel
+## Typography
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Headlines: Sora
+- Technical Labels: Space Grotesk
+- Body Text: Sora
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Accessibility
+
+- Semantic HTML structure
+- Sufficient color contrast
+- Keyboard navigation support
+- Screen reader friendly content
+
+## Performance
+
+- Instanced meshes for buildings
+- Lightweight shaders
+- Transform-based animations
+- Minimal geometry usage
