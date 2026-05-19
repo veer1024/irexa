@@ -1,0 +1,18 @@
+# Required image files
+IREXA Browser Icon.png
+IREXA Logo (Dark Mode).png
+India Map.png
+3-Drishti Logo.png
+3-Drishti SUMMARY.png
+TejasKalp (Dark Mode).png
+TejasKalp.png
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editor files
+.vscode/
+*.swp
+*.swo
